@@ -77,8 +77,7 @@ export class MessageController {
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
   public async getAll(@Param('id') chatId: string) {
-    console.log(chatId);
-    const messages = this.chatService.getMessages(chatId);
+    const messages = await this.chatService.getMessages(chatId);
     if (!messages) {
       throw new NotFoundException();
     }

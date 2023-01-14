@@ -84,6 +84,10 @@ export class ChatController {
     }
     const chats = await this.chatService.getChats(user);
 
+    if (!chats.length) {
+      throw new NotFoundException();
+    }
+
     return chats;
   }
 }

@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/models/user.model';
-import { DataSource, In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ChatCreateDTO } from './dto/chatCreate.dto';
 import { MessageDTO } from './dto/message.dto';
+import { SendedMessage } from './dto/sendedMessage.dto';
 import { ChatInterface } from './interfaces/chat.interface';
 import { CreatedChatInterface } from './interfaces/createdChat.interface';
+import { SendedMessageInterface } from './interfaces/sendedMessage.interface';
 import { Chat } from './models/chat.model';
 import { Message } from './models/message.model';
 
@@ -65,11 +67,28 @@ export class ChatService {
     }
     chat = await this.joinChat(chat, user);
     this.chatRepository.save(chat);
+
+    const users = (await chat.users).map((user) => {
+      return {
+        id: user.id,
+        nickname: user.nickname,
+      };
+    });
+
+    const messages = await Promise.all(
+      (
+        await chat.messages
+      ).map(async (message) => {
+        return await SendedMessage.getData(user, message);
+      }),
+    );
+
     return {
       id: chat.id,
       name: chat.name,
       creator_id: (await chat.creator).id,
-      messages: await chat.messages,
+      messages: messages,
+      users: users,
     };
   }
 
@@ -78,27 +97,39 @@ export class ChatService {
     return chats;
   }
 
-  public async getMessages(id: string) {
+  public async getMessages(id: string): Promise<SendedMessageInterface[]> {
     const chat = await this.chatRepository.findOneBy({ id });
     if (!chat) {
       return null;
     }
-    const messages = await chat.messages;
-    return {
-      messages,
-    };
+    const messageModels = await chat.messages;
+
+    const messages = await Promise.all(
+      messageModels.map(async (message) => {
+        const user = await message.user;
+        return SendedMessage.getData(user, message);
+      }),
+    );
+
+    return messages;
   }
 
-  public async getMessage(id: number) {
+  public async getMessage(id: number): Promise<SendedMessageInterface> {
     const message = await this.messageRepository.findOneBy({ id });
     if (!message) {
       return null;
     }
 
-    return message;
+    const user = await message.user;
+
+    return await SendedMessage.getData(user, message);
   }
 
-  public async createMessage(messageDto: MessageDTO, chat: Chat, user: User) {
+  public async createMessage(
+    messageDto: MessageDTO,
+    chat: Chat,
+    user: User,
+  ): Promise<SendedMessageInterface> {
     const message = this.messageRepository.create({
       text: messageDto.text,
       referencedMessage: messageDto.referencedMesage,
@@ -107,15 +138,6 @@ export class ChatService {
     message.chat = Promise.resolve(chat);
     message.user = Promise.resolve(user);
     await this.messageRepository.save(message);
-    return {
-      message_id: message.id,
-      user_id: user.id,
-      chat_id: chat.id,
-      text: message.text,
-      image: message.image,
-      referencedMessage: message.referencedMessage,
-      nickname: user.nickname,
-      created: message.createdAt,
-    };
+    return await SendedMessage.getData(user, message);
   }
 }
