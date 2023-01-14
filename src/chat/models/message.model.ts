@@ -14,19 +14,19 @@ export class Message {
   id: number;
 
   @ManyToOne(() => User, (user) => user.messages, { cascade: true })
-  user: User;
+  user: Promise<User>;
 
   @ManyToOne(() => Chat, (chat) => chat.messages, { cascade: true })
-  chat: Chat;
+  chat: Promise<Chat>;
 
   @Column()
   text: string;
 
   @Column({ nullable: true })
-  referencedMessage: string;
+  referencedMessage?: number;
 
-  @Column()
-  image: string;
+  @Column({ nullable: true })
+  image?: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -15,7 +15,7 @@ export class UserService {
   ) {}
 
   public async findUser(email: string): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ email: email });
+    const user = await this.userRepository.findOneBy({ email });
     if (!user) {
       return null;
     }
@@ -56,6 +56,7 @@ export class UserService {
   ): Promise<{ email: string; token: string }> {
     const payload: UserPayloadInterface = {
       email: user.email,
+      userId: user.id,
     };
 
     return {

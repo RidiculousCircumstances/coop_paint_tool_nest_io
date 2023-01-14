@@ -7,23 +7,33 @@ import {
   ManyToMany,
   OneToMany,
   CreateDateColumn,
+  OneToOne,
+  ManyToOne,
 } from 'typeorm';
 import { Message } from './message.model';
 
 @Entity()
-@Unique(['chat_link'])
 export class Chat {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  // @Column({
+  //   type: 'varchar',
+  //   length: 100,
+  // })
+  // chat_link: string;
 
   @Column()
-  chat_link: string;
+  name: string;
 
   @ManyToMany(() => User, (user) => user.chats)
-  users: User[];
+  users: Promise<User[]>;
 
   @OneToMany(() => Message, (message) => message.chat)
-  messages: Message;
+  messages: Promise<Message[]>;
+
+  @ManyToOne(() => User, (user) => user.chats)
+  creator: Promise<User>;
 
   @CreateDateColumn()
   createdAt: Date;

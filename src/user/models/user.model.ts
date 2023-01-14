@@ -14,7 +14,7 @@ import {
 @Entity()
 @Unique(['email'])
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column({
@@ -47,10 +47,13 @@ export class User {
       referencedColumnName: 'id',
     },
   })
-  chats: Chat[];
+  chats: Promise<Chat[]>;
+
+  @OneToMany(() => Chat, (chat) => chat.creator)
+  created_chats: Promise<Chat[]>;
 
   @OneToMany(() => Message, (message) => message.user)
-  messages: Message[];
+  messages: Promise<Message[]>;
 
   @CreateDateColumn()
   createdAt: Date;

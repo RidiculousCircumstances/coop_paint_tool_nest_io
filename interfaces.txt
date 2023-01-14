@@ -76,7 +76,9 @@ Models {
 	<chat_user>
 	Chat {
 		chat_id,
-		f-room_id,
+		name,
+		creator_id,
+		///f-room_id,
 		f-user_id
 	}
 
