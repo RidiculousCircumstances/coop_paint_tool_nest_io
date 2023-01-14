@@ -1,0 +1,93 @@
+IO_Objects {
+
+	/**
+	/* Загружать весь чат по каждому ивенту нет смысла. Нужно формировать пост запрос на отправленное сообщение
+	/*
+	/* Клиент не отправляет оповещение об отправке сообщения. Сервер принимает пост запрос, формирует 
+	/* message_id, и оповещает клиентов. Клиент по получению сообщения отправляет гет запрос с message_id.
+	chat events: {
+		user_id: string,
+		message_id: string,
+		room_id: string ?
+	}
+
+	!streaming_object
+	canvas events: {
+		user_id: string,
+		room_id: string,
+		tool_type: string,
+		tool_props: {
+			coord_props: string[],
+			style_props?: {
+				fillStyle: string,
+				strokeColor: string,
+				lineWidth: number
+			}
+		}
+	}
+
+	/**
+	/* Логика взаимодействия клиентов с изображениями аналогичная. Изображение на канвасе свитчит опциональные свойства.
+	/*
+	/*
+	image uploading events: {
+		user_id: string,
+		room_id: string,
+		message_id?: string === chat_events.message_id
+		coord_props?: string[],
+	}
+}
+
+Datas {
+
+	message {
+		text: string,
+		image: 	<mp_formdata>
+	}
+
+	user_reg {
+		email: string,
+		nickname: string,
+		password: string
+	}
+
+	user_log {
+	email: string,
+	password: string
+	}
+
+}
+
+
+Models {
+
+	User {
+		user_id,
+		nickname,
+		email,
+		hashed_password
+	}
+
+	<room_user>
+	Room {
+		room_id
+	}
+
+	<chat_user>
+	Chat {
+		chat_id,
+		f-room_id,
+		f-user_id
+	}
+
+	Message {
+		message_id,
+		f-chat_id,
+		f-user_id,
+		in-f-message_id
+		text,
+		image
+	}
+}
+
+	

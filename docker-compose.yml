@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+
+  mysql:
+    build:
+      dockerfile: docker/db/db.docker
+    container_name: mysql-server
+    restart: always
+    ports:  
+        - "3307:3306"
+    environment:
+        - "MYSQL_ROOT_PASSWORD=root"
+        - "MYSQL_USER=app_user"
+        - "MYSQL_PASSWORD=secret"
+        - "MYSQL_DATABASE=app"
+
+    volumes:
+        -   ./storage/docker/mysql:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
