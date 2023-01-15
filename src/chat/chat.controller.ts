@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -80,7 +81,7 @@ export class ChatController {
   public async getAll(@UserEmail() email: string): Promise<Chat[]> {
     const user = await this.userService.findUser(email);
     if (!user) {
-      throw new NotFoundException();
+      throw new UnauthorizedException();
     }
     const chats = await this.chatService.getChats(user);
 

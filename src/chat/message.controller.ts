@@ -2,17 +2,28 @@ import {
   BadRequestException,
   Body,
   Controller,
+  FileTypeValidator,
   Get,
   HttpCode,
+  MaxFileSizeValidator,
   NotFoundException,
   Param,
+  ParseFilePipe,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+
 import { UserEmail } from 'src/decorators/UserEmail.decorator';
+import { WebpInterceptor } from 'src/interceptors/webp.Iterceptor';
 import { SocketGateway } from 'src/socket/socket.gateway';
+
+import { uploadSettings } from 'src/uploading/uploadSettings';
 import { JwtAuthGuard } from 'src/user/guards/JwtAuth.guard';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from './chat.service';
@@ -27,7 +38,7 @@ export class MessageController {
   ) {}
 
   /**
-   *
+   * Сохранить сообщение с/без изображения
    * @param messageDto
    * @param email
    * @returns
@@ -36,16 +47,36 @@ export class MessageController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image'), WebpInterceptor)
   public async create(
     @Body() messageDto: MessageDTO,
     @UserEmail() email: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        validators: [
+          new FileTypeValidator({ fileType: 'image/jpeg|image/png' }),
+          new MaxFileSizeValidator({ maxSize: 8000000 }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ) {
     const user = await this.userService.findUser(email);
+    const fileName = file.filename;
     const chat = await this.chatService.findChat(messageDto.chatId);
+
     if (!user || !chat) {
       throw new BadRequestException();
     }
-    return this.chatService.createMessage(messageDto, chat, user);
+    const message = await this.chatService.createMessage(
+      messageDto,
+      chat,
+      user,
+      fileName,
+    );
+    this.socketGateway.chatMessage(chat.id, message.messageId);
+    return message;
   }
 
   /**

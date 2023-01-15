@@ -16,22 +16,36 @@ export class SocketGateway
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    console.log('client connected');
-    client.emit('connected', 'client connected');
+  roomId: string;
+
+  handleConnection(@MessageBody() data: any, client: Socket) {
+    client.emit('connected', data);
   }
 
-  handleDisconnect(client: Socket) {
+  public handleDisconnect(client: Socket) {
     console.log('client connected');
     client.emit('disconnected');
   }
 
+  @SubscribeMessage('joinToChat')
+  public join(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    client.join(data.chatId);
+  }
+
   @SubscribeMessage('stream')
-  async broadcastEvent(
+  public broadcastEvent(
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
-  ): Promise<void> {
+  ): void {
     console.log(data, client.id);
     client.broadcast.to(data.room_id).emit('stream', data);
+  }
+
+  public chatMessage(chatId: string, messageId: number): void {
+    const io = this.server.sockets;
+    io.to(chatId).emit('chatMessage', {
+      chatId,
+      messageId,
+    });
   }
 }

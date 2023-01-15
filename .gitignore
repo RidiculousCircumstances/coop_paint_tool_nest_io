@@ -4,6 +4,7 @@
 
 #storage
 /storage/docker/mysql/*
+/storage/static/chatimg/*
 
 #configs
 .env

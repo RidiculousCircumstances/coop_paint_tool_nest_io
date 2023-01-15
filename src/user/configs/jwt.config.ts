@@ -7,7 +7,7 @@ export const getJwtConfig = async (
   return {
     secret: configService.get('JWT_TOKEN'),
     signOptions: {
-      expiresIn: 3600,
+      expiresIn: 36000,
     },
   };
 };

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/models/user.model';
+import { User } from '../user/models/user.model';
 import { Repository } from 'typeorm';
 import { ChatCreateDTO } from './dto/chatCreate.dto';
 import { MessageDTO } from './dto/message.dto';
@@ -10,6 +10,8 @@ import { CreatedChatInterface } from './interfaces/createdChat.interface';
 import { SendedMessageInterface } from './interfaces/sendedMessage.interface';
 import { Chat } from './models/chat.model';
 import { Message } from './models/message.model';
+import sharp from 'sharp';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChatService {
@@ -17,6 +19,7 @@ export class ChatService {
     @InjectRepository(Chat) private chatRepository: Repository<Chat>,
     @InjectRepository(Message) private messageRepository: Repository<Message>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
   public async findChat(id: string): Promise<Chat | null> {
@@ -129,11 +132,12 @@ export class ChatService {
     messageDto: MessageDTO,
     chat: Chat,
     user: User,
+    fileName: string,
   ): Promise<SendedMessageInterface> {
     const message = this.messageRepository.create({
       text: messageDto.text,
       referencedMessage: messageDto.referencedMesage,
-      image: messageDto.image,
+      image: fileName,
     });
     message.chat = Promise.resolve(chat);
     message.user = Promise.resolve(user);
