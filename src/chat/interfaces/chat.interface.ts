@@ -4,6 +4,6 @@ export interface ChatInterface {
   id: string;
   name: string;
   creator_id: number;
-  messages: SendedMessageInterface[];
+  messages?: SendedMessageInterface[];
   users: { id: number; nickname: string }[];
 }

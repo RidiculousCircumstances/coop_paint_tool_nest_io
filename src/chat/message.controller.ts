@@ -9,7 +9,9 @@ import {
   NotFoundException,
   Param,
   ParseFilePipe,
+  ParseIntPipe,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -17,13 +19,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
-
 import { UserEmail } from 'src/decorators/UserEmail.decorator';
 import { WebpInterceptor } from 'src/interceptors/webp.Iterceptor';
 import { SocketGateway } from 'src/socket/socket.gateway';
-
-import { uploadSettings } from 'src/uploading/uploadSettings';
 import { JwtAuthGuard } from 'src/user/guards/JwtAuth.guard';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from './chat.service';
@@ -98,7 +96,7 @@ export class MessageController {
 
   /**
    *
-   * Получить все сообщения из чата
+   * Получить сообщения из чата
    *
    * @param chatId
    * @returns
@@ -107,8 +105,11 @@ export class MessageController {
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
-  public async getAll(@Param('id') chatId: string) {
-    const messages = await this.chatService.getMessages(chatId);
+  public async getAll(
+    @Param('id') chatId: string,
+    @Query('limit', ParseIntPipe) limit: number,
+  ) {
+    const messages = await this.chatService.getMessages(chatId, limit);
     if (!messages) {
       throw new NotFoundException();
     }

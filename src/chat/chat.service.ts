@@ -78,34 +78,46 @@ export class ChatService {
       };
     });
 
-    const messages = await Promise.all(
-      (
-        await chat.messages
-      ).map(async (message) => {
-        return await SendedMessage.getData(user, message);
-      }),
-    );
-
     return {
       id: chat.id,
       name: chat.name,
       creator_id: (await chat.creator).id,
-      messages: messages,
       users: users,
     };
   }
 
-  public async getChats(user: User): Promise<Chat[]> {
-    const chats = await user.chats;
+  public async getChats(user: User): Promise<ChatInterface[]> {
+    const chatModels = await user.chats;
+    const chats = await Promise.all(
+      chatModels.map((chat) => {
+        return this.getChat(chat.id, user);
+      }),
+    );
     return chats;
   }
 
-  public async getMessages(id: string): Promise<SendedMessageInterface[]> {
+  public async getMessages(
+    id: string,
+    limit?: number,
+  ): Promise<SendedMessageInterface[]> {
     const chat = await this.chatRepository.findOneBy({ id });
     if (!chat) {
       return null;
     }
-    const messageModels = await chat.messages;
+
+    limit = limit ?? 20;
+
+    const messageModels = await this.messageRepository.find({
+      where: {
+        chat: {
+          id: chat.id,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      take: limit,
+    });
 
     const messages = await Promise.all(
       messageModels.map(async (message) => {

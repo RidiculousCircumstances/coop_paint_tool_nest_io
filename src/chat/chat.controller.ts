@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UnauthorizedException,
   UseGuards,
   UsePipes,
@@ -78,7 +79,7 @@ export class ChatController {
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
-  public async getAll(@UserEmail() email: string): Promise<Chat[]> {
+  public async getAll(@UserEmail() email: string): Promise<ChatInterface[]> {
     const user = await this.userService.findUser(email);
     if (!user) {
       throw new UnauthorizedException();

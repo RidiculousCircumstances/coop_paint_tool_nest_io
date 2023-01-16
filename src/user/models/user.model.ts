@@ -33,7 +33,7 @@ export class User {
     type: 'varchar',
     length: 500,
   })
-  password: boolean;
+  password: string;
 
   @ManyToMany(() => Chat, (chat) => chat.users, { cascade: true })
   @JoinTable({
