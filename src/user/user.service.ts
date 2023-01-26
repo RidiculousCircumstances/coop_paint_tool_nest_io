@@ -6,6 +6,7 @@ import { User } from './models/user.model';
 import { genSalt, hash, compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { UserPayloadInterface } from './interfaces/userPayload.interface';
+import { UserResponseInterface } from './interfaces/userResponse.interface';
 
 @Injectable()
 export class UserService {
@@ -23,7 +24,9 @@ export class UserService {
     return user;
   }
 
-  public async createUser(dto: UserRegistrationDTO): Promise<User> {
+  public async createUser(
+    dto: UserRegistrationDTO,
+  ): Promise<UserResponseInterface> {
     const salt = await genSalt(10);
 
     const newUser = this.userRepository.create({
@@ -32,7 +35,7 @@ export class UserService {
       password: await hash(dto.password, salt),
     });
     this.userRepository.save(newUser);
-    return newUser;
+    return this.authorizeUser(newUser);
   }
 
   public async validateUser(
@@ -51,17 +54,18 @@ export class UserService {
     return user;
   }
 
-  public async authorizeUser(
-    user: User,
-  ): Promise<{ email: string; token: string }> {
+  public async authorizeUser(user: User): Promise<UserResponseInterface> {
     const payload: UserPayloadInterface = {
       email: user.email,
       userId: user.id,
     };
 
     return {
+      id: user.id,
       email: user.email,
+      nickname: user.nickname,
       token: await this.jwtService.signAsync(payload),
+      createdAt: user.createdAt,
     };
   }
 }

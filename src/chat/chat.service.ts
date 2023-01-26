@@ -53,14 +53,29 @@ export class ChatService {
   public async createChat(
     creator: User,
     dto: ChatCreateDTO,
-  ): Promise<CreatedChatInterface> {
+  ): Promise<ChatInterface> {
     let newChat = this.chatRepository.create({
       name: dto.name,
     });
     newChat.creator = Promise.resolve(creator);
     newChat = await this.joinChat(newChat, creator);
     await this.chatRepository.save(newChat);
-    return { id: newChat.id, name: newChat.name };
+
+    return {
+      id: newChat.id,
+      name: newChat.name,
+      creator: {
+        id: creator.id,
+        nickname: creator.nickname,
+      },
+      users: [
+        {
+          id: creator.id,
+          nickname: creator.nickname,
+        },
+      ],
+      created_at: newChat.createdAt,
+    };
   }
 
   public async getChat(id: string, user: User): Promise<ChatInterface | null> {
@@ -78,11 +93,17 @@ export class ChatService {
       };
     });
 
+    const creator = await chat.creator;
+
     return {
       id: chat.id,
       name: chat.name,
-      creator_id: (await chat.creator).id,
+      creator: {
+        id: creator.id,
+        nickname: creator.nickname,
+      },
       users: users,
+      created_at: chat.createdAt,
     };
   }
 

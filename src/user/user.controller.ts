@@ -14,6 +14,7 @@ import {
 } from 'src/constants/constants';
 import { UserAuthorizationDTO } from './dto/userAutorization.dto';
 import { UserRegistrationDTO } from './dto/userRegistration.dto';
+import { UserResponseInterface } from './interfaces/userResponse.interface';
 import { User } from './models/user.model';
 import { UserService } from './user.service';
 
@@ -26,7 +27,7 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   public async register(
     @Body() registerData: UserRegistrationDTO,
-  ): Promise<User | null> {
+  ): Promise<UserResponseInterface | null> {
     const isUserAlreadyExists: User | null = await this.userService.findUser(
       registerData.email,
     );
@@ -42,7 +43,7 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   public async autorize(
     @Body() { email, password }: UserAuthorizationDTO,
-  ): Promise<{ email: string; token: string }> {
+  ): Promise<UserResponseInterface> {
     const user = await this.userService.validateUser(email, password);
     if (user) {
       return this.userService.authorizeUser(user);

@@ -7,6 +7,5 @@ export class UserAuthorizationDTO {
 
   @IsString()
   @IsDefined()
-  @MinLength(8)
   password: string;
 }
