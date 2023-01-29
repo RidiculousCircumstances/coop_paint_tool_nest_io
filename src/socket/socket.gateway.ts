@@ -8,6 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JoinRoom, LeaveRoom } from './socket.interfaces/events';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SocketGateway
@@ -18,34 +19,45 @@ export class SocketGateway
 
   roomId: string;
 
-  handleConnection(@MessageBody() data: any, client: Socket) {
-    client.emit('connected', data);
-  }
-
-  public handleDisconnect(client: Socket) {
+  handleConnection() {
     console.log('client connected');
-    client.emit('disconnected');
   }
 
-  @SubscribeMessage('joinToChat')
-  public join(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    client.join(data.chatId);
+  public handleDisconnect() {
+    console.log('client disconnected');
   }
 
-  @SubscribeMessage('stream')
-  public broadcastEvent(
+  @SubscribeMessage('joinRoom')
+  public joinRoom(
+    @MessageBody() data: JoinRoom,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.join(data.roomId);
+    client.to(data.roomId).emit('joinRoom', data);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  public leaveRoom(
+    @MessageBody() data: LeaveRoom,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.leave(data.roomId);
+    client.to(data.roomId).emit('leaveRoom', data);
+  }
+
+  /**
+   *
+   * @param data
+   * @param client
+   * Оповещение о новом сообщении
+   */
+  @SubscribeMessage('chatMessage')
+  public chatMessage(
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
   ): void {
-    console.log(data, client.id);
-    client.broadcast.to(data.room_id).emit('stream', data);
-  }
-
-  public chatMessage(chatId: string, messageId: number): void {
-    const io = this.server.sockets;
-    io.to(chatId).emit('chatMessage', {
-      chatId,
-      messageId,
+    client.to(data.roomId).emit('chatMessage', {
+      messageId: data.message_id,
     });
   }
 }

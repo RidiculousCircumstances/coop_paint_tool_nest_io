@@ -73,7 +73,7 @@ export class MessageController {
       user,
       fileName,
     );
-    this.socketGateway.chatMessage(chat.id, message.messageId);
+    // this.socketGateway.chatMessage(chat.id, message.messageId);
     return message;
   }
 
