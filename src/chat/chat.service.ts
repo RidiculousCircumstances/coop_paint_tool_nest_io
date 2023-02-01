@@ -165,7 +165,7 @@ export class ChatService {
     messageDto: MessageDTO,
     chat: Chat,
     user: User,
-    fileName: string,
+    fileName?: string,
   ): Promise<SendedMessageInterface> {
     const message = this.messageRepository.create({
       text: messageDto.text,

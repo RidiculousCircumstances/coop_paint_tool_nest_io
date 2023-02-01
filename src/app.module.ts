@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket/socket.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MySQLConfigService } from './config/MySQLConfig.service';
@@ -7,8 +7,6 @@ import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { MulterModule } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 
 @Module({
   imports: [

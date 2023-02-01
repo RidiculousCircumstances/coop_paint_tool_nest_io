@@ -45,7 +45,7 @@ export class MessageController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image'), WebpInterceptor)
+  @UseInterceptors(FileInterceptor('image', {}), WebpInterceptor)
   public async create(
     @Body() messageDto: MessageDTO,
     @UserEmail() email: string,
@@ -58,10 +58,12 @@ export class MessageController {
         ],
       }),
     )
-    file: Express.Multer.File,
+    file?: Express.Multer.File,
   ) {
     const user = await this.userService.findUser(email);
-    const fileName = file.filename;
+
+    const fileName = file ? file.filename : null;
+
     const chat = await this.chatService.findChat(messageDto.chatId);
 
     if (!user || !chat) {
@@ -87,8 +89,9 @@ export class MessageController {
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
   public async get(@Param('id') id: number) {
-    const message = this.chatService.getMessage(id);
+    const message = await this.chatService.getMessage(id);
     if (!message) {
+      console.log(111);
       throw new NotFoundException();
     }
     return this.chatService.getMessage(id);
@@ -107,7 +110,7 @@ export class MessageController {
   @UseGuards(JwtAuthGuard)
   public async getAll(
     @Param('id') chatId: string,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query('limit') limit?: number,
   ) {
     const messages = await this.chatService.getMessages(chatId, limit);
     if (!messages) {
