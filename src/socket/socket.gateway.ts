@@ -8,7 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { JoinRoom, LeaveRoom } from './socket.interfaces/events';
+import { JoinRoom, LeaveRoom, SendMessage } from './socket.interfaces/events';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SocketGateway
@@ -51,13 +51,11 @@ export class SocketGateway
    * @param client
    * Оповещение о новом сообщении
    */
-  @SubscribeMessage('chatMessage')
+  @SubscribeMessage('sendMessage')
   public chatMessage(
-    @MessageBody() data: any,
+    @MessageBody() data: SendMessage,
     @ConnectedSocket() client: Socket,
   ): void {
-    client.to(data.roomId).emit('chatMessage', {
-      messageId: data.message_id,
-    });
+    client.to(data.roomId).emit('sendMessage', { ...data });
   }
 }

@@ -18,6 +18,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserEmail } from 'src/decorators/UserEmail.decorator';
 import { WebpInterceptor } from 'src/interceptors/webp.Iterceptor';
@@ -33,6 +34,7 @@ export class MessageController {
     private readonly chatService: ChatService,
     private readonly userService: UserService,
     private readonly socketGateway: SocketGateway,
+    private readonly config: ConfigService,
   ) {}
 
   /**
@@ -62,7 +64,11 @@ export class MessageController {
   ) {
     const user = await this.userService.findUser(email);
 
-    const fileName = file ? file.filename : null;
+    const fileName = file
+      ? `${this.config.get('APP_URL')}:${this.config.get('APP_PORT')}${
+          file.filename
+        }`
+      : null;
 
     const chat = await this.chatService.findChat(messageDto.chatId);
 
@@ -91,7 +97,6 @@ export class MessageController {
   public async get(@Param('id') id: number) {
     const message = await this.chatService.getMessage(id);
     if (!message) {
-      console.log(111);
       throw new NotFoundException();
     }
     return this.chatService.getMessage(id);
