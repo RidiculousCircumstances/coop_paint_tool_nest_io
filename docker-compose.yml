@@ -7,8 +7,8 @@ services:
       dockerfile: docker/db/db.docker
     container_name: mysql-server
     restart: always
-    ports:  
-        - "3307:3306"
+    # ports:  
+    #     - "3307:3306"
     environment:
         - "MYSQL_ROOT_PASSWORD=root"
         - "MYSQL_USER=app_user"
@@ -18,4 +18,16 @@ services:
     volumes:
         -   ./storage/docker/mysql:/var/lib/mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  app:
+    build:
+      dockerfile: docker/app/app.docker
+    container_name: app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - ""
+    links:
+      - "mysql-server"
 

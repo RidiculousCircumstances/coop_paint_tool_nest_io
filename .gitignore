@@ -8,6 +8,7 @@
 
 #configs
 .env
+.env.prod
 .vscode
 
 # Logs
