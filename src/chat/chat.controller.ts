@@ -13,10 +13,10 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserEmail } from 'src/decorators/UserEmail.decorator';
-import { SocketGateway } from 'src/socket/socket.gateway';
-import { JwtAuthGuard } from 'src/user/guards/JwtAuth.guard';
-import { UserService } from 'src/user/user.service';
+import { UserEmail } from '../decorators/UserEmail.decorator';
+import { SocketGateway } from '../socket/socket.gateway';
+import { JwtAuthGuard } from '../user/guards/JwtAuth.guard';
+import { UserService } from '../user/user.service';
 import { ChatService } from './chat.service';
 import { ChatCreateDTO } from './dto/chatCreate.dto';
 import { ChatInterface } from './interfaces/chat.interface';
