@@ -38,22 +38,22 @@ jobs:
         username: ${{ github.actor }}
         password: "${{ secrets.GITHUB_TOKEN }}"
 
-    #  - name: "Build & deploy db"
+     - name: "Build & deploy db"
+       uses: docker/build-push-action@v2
+       with:
+        context: .
+        file: ./docker/db/db.docker
+        push: true
+        tags: "develop"
+
+    #  - name: "Build & deploy app"
     #    uses: docker/build-push-action@v2
     #    with:
     #     # context: .
-    #     file: ./docker/db/db.docker
+    #     file: ./docker/app/app.docker
+    #     # file: ${{ matrix.dockerfile }}
     #     push: true
     #     tags: "develop"
-
-     - name: "Build & deploy app"
-       uses: docker/build-push-action@v2
-       with:
-        # context: .
-        file: ./docker/app/app.docker
-        # file: ${{ matrix.dockerfile }}
-        push: true
-        tags: "develop"
 
      - name: Image digest
        run: echo ${{ steps.docker_build.outputs.digest }}
