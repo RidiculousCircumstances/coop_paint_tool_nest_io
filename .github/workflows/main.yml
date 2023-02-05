@@ -30,7 +30,7 @@ jobs:
         
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: "${{ secrets.REGISTRY_TOKEN }}"
+        password: "${{ secrets.GITHUB_TOKEN }}"
 
      - name: "Build & deploy db"
        uses: docker/build-push-action@v2
