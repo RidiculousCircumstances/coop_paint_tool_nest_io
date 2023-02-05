@@ -50,8 +50,8 @@ jobs:
        uses: docker/build-push-action@v2
        with:
         # context: .
-        dockerfile: ./docker/app/app.docker
-        file: ${{ matrix.dockerfile }}
+        file: ./docker/app/app.docker
+        # file: ${{ matrix.dockerfile }}
         push: true
         tags: "develop"
 
