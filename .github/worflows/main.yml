@@ -41,7 +41,7 @@ jobs:
         context: .
         file: ${{ matrix.dockerfile }}
         push: true
-        tags: ghcr.io/ridiculouscircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io
+        tags: ghcr.io/ridiculouscircumstances/coop_tool_client_pro/coop_tool_client_pro
 
 
      - name: Image digest
