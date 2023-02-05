@@ -41,10 +41,12 @@ jobs:
      - name: "Build & deploy db"
        uses: docker/build-push-action@v2
        with:
-        context: .
+        # context: .
         file: ./docker/db/db.docker
         push: true
-        tags: "develop"
+        tags: |
+          RidiculousCircumstances/coop_paint_tool_nest_io:${{ github.sha }}
+          RidiculousCircumstances/coop_paint_tool_nest_io:latest
 
     #  - name: "Build & deploy app"
     #    uses: docker/build-push-action@v2
