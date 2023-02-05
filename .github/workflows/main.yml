@@ -12,9 +12,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./docker/db/db.docker
-            # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io
+            image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io
           - dockerfile: ./docker/app/app.docker
-            # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io
+            image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io
     permissions:
       contents: read
       packages: write
