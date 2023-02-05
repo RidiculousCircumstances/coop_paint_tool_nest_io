@@ -33,8 +33,8 @@ jobs:
         push: true
         context: .
         file: ./docker/db
-        tags: |
-         ghcr.io/${{ github.repository_owner }}/prod-db_coop_painting:${{ github.event.release.tag_name }}
+        # tags: |
+        #  ghcr.io/${{ github.repository_owner }}/prod-db_coop_painting:${{ github.event.release.tag_name }}
 
      - name: "Build & deploy app"
        uses: docker/build-push-action@v2
@@ -42,5 +42,5 @@ jobs:
         push: true
         context: .
         file: ./docker/app
-        tags: |
-         ghcr.io/${{ github.repository_owner }}/prod-app_coop_painting:${{ github.event.release.tag_name }}
+        # tags: |
+        #  ghcr.io/${{ github.repository_owner }}/prod-app_coop_painting:${{ github.event.release.tag_name }}
