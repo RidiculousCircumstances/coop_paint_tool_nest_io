@@ -7,24 +7,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - dockerfile: ./docker/db/db.docker
-            # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_db
-          - dockerfile: ./docker/app/app.docker
-            # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_app
-    permissions:
-      contents: read
-      packages: write
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     include:
+    #       - dockerfile: ./docker/db/db.docker
+    #         # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_db
+    #       - dockerfile: ./docker/app/app.docker
+    #         # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_app
+    # permissions:
+    #   contents: read
+    #   packages: write
 
     steps:
 
      - name: "Checkout repository"
        uses: actions/checkout@v3
-       with:
-        ref: 'master'
 
      - name: "Set up QEMU"
        uses: docker/setup-qemu-action@v2
@@ -40,18 +38,19 @@ jobs:
         username: ${{ github.actor }}
         password: "${{ secrets.GITHUB_TOKEN }}"
 
-     - name: "Build & deploy db"
-       uses: docker/build-push-action@v2
-       with:
-        context: .
-        file: ./docker/db/db.docker
-        push: true
-        tags: "develop"
+    #  - name: "Build & deploy db"
+    #    uses: docker/build-push-action@v2
+    #    with:
+    #     # context: .
+    #     file: ./docker/db/db.docker
+    #     push: true
+    #     tags: "develop"
 
      - name: "Build & deploy app"
        uses: docker/build-push-action@v2
        with:
         context: .
+        dockerfile: ./docker/app/app.docker
         file: ${{ matrix.dockerfile }}
         push: true
         tags: "develop"
