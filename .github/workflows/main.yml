@@ -35,15 +35,15 @@ jobs:
      - name: "Build & deploy db"
        uses: docker/build-push-action@v2
        with:
-        push: true
         context: .
         file: ./docker/db/db.docker
+        push: true
         tags: "develop"
 
      - name: "Build & deploy app"
        uses: docker/build-push-action@v2
        with:
-        push: true
         context: .
         file: ./docker/app/app.docker
+        push: true
         tags: "develop"
