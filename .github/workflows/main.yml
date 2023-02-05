@@ -45,8 +45,8 @@ jobs:
         file: ./docker/db/db.docker
         push: true
         tags: |
-          RidiculousCircumstances/coop_paint_tool_nest_io:${{ github.sha }}
-          RidiculousCircumstances/coop_paint_tool_nest_io:latest
+          ridiculouscircumstances/coop_paint_tool_nest_io:${{ github.sha }}
+          ridiculouscircumstances/coop_paint_tool_nest_io:latest
 
     #  - name: "Build & deploy app"
     #    uses: docker/build-push-action@v2
