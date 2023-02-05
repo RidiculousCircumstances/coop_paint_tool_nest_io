@@ -43,7 +43,7 @@ jobs:
        with:
         # context: .
         file: ./docker/db/db.docker
-        push: true
+        load: true
         tags: |
           ridiculouscircumstances/coop_paint_tool_nest_io:${{ github.sha }}
           ridiculouscircumstances/coop_paint_tool_nest_io:latest
