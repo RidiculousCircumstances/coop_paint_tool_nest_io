@@ -32,7 +32,7 @@ jobs:
        with:
         push: true
         context: .
-        file: ./docker/db
+        file: ./docker/db/db.docker
         tags: "develop"
 
      - name: "Build & deploy app"
@@ -40,5 +40,5 @@ jobs:
        with:
         push: true
         context: .
-        file: ./docker/app
+        file: ./docker/app/app.docker
         tags: "develop"
