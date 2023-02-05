@@ -12,9 +12,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./docker/db/db.docker
-            image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_db
+            # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_db
           - dockerfile: ./docker/app/app.docker
-            image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_app
+            # image: ghcr.io/RidiculousCircumstances/coop_paint_tool_nest_io/coop_paint_tool_nest_io_app
     permissions:
       contents: read
       packages: write
@@ -55,3 +55,6 @@ jobs:
         file: ${{ matrix.dockerfile }}
         push: true
         tags: "develop"
+
+     - name: Image digest
+       run: echo ${{ steps.docker_build.outputs.digest }}
