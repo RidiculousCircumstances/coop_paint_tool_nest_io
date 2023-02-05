@@ -19,7 +19,6 @@ RUN npm ci --only=production && npm cache clean --force
 USER node
 
 
-
 #production
 FROM node:18-alpine As production
 COPY --chown=node:node --from=build /var/www/node_modules ./node_modules

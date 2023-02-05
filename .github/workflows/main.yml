@@ -11,8 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./docker/db/db.docker
-          - dockerfile: ./docker/app/app.docker
+          - dockerfile: ./docker/db/Dockerfile
+          - dockerfile: ./docker/app/Dockerfile
     permissions:
       contents: read
       packages: write
