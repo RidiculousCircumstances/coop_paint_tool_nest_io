@@ -22,13 +22,11 @@ jobs:
 
      - name: "Login to GitHub Registry"
        uses: docker/login-action@v2
-       env:
-        REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
        with:
         
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: "$REGISTRY_TOKEN"
+        password: "${{ secrets.REGISTRY_TOKEN }}"
 
      - name: "Build & deploy db"
        uses: docker/build-push-action@v2
