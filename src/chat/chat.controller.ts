@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { UserEmail } from '../decorators/UserEmail.decorator';
 import { SocketGateway } from '../socket/socket.gateway';
-import { JwtAuthGuard } from '../user/guards/JwtAuth.guard';
+import { JwtAuthGuard } from '../user/guards/jwtAuth.guard';
 import { UserService } from '../user/user.service';
 import { ChatService } from './chat.service';
 import { ChatCreateDTO } from './dto/chatCreate.dto';

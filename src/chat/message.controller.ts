@@ -22,9 +22,9 @@ import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserEmail } from 'src/decorators/UserEmail.decorator';
 import { WebpInterceptor } from 'src/interceptors/webp.Iterceptor';
-import { SocketGateway } from 'src/socket/socket.gateway';
-import { JwtAuthGuard } from 'src/user/guards/JwtAuth.guard';
-import { UserService } from 'src/user/user.service';
+import { SocketGateway } from '../socket/socket.gateway';
+import { JwtAuthGuard } from '../user/guards/jwtAuth.guard';
+import { UserService } from '../user/user.service';
 import { ChatService } from './chat.service';
 import { MessageDTO } from './dto/message.dto';
 
