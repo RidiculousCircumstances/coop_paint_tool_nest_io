@@ -5,8 +5,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Chat } from './chat.model';
+import { Image } from './image.model';
 
 @Entity()
 export class Message {
@@ -19,14 +21,16 @@ export class Message {
   @ManyToOne(() => Chat, (chat) => chat.messages, { cascade: true })
   chat: Promise<Chat>;
 
-  @Column()
+  @OneToMany(() => Image, (image) => image.message)
+  images: Promise<Image[]>;
+
+  @Column({
+    length: 5000,
+  })
   text: string;
 
   @Column({ nullable: true })
   referencedMessage?: number;
-
-  @Column({ nullable: true })
-  image?: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -18,21 +18,27 @@ export class WebpInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Promise<Observable<any>> {
-    // const buffer = context.getArgByIndex(0).file.buffer;
     const contextHttp = context.switchToHttp();
-    const buffer = contextHttp.getRequest().file?.buffer;
+    const fiiles = contextHttp.getRequest().files;
 
-    if (!buffer) {
+    if (!fiiles || fiiles.length === 0) {
       return next.handle();
     }
 
-    const filename = setFileNameWithExt('.webp');
-    await sharp(buffer)
-      .webp()
-      .toFile(
-        `${join(this.configService.get<string>('IMAGES_DEST'), filename)}`,
-      );
-    context.getArgByIndex(0).file.filename = filename;
+    const fileNames = [];
+    await Promise.all(
+      fiiles.map(async (file) => {
+        const buffer = file.buffer;
+        const filename = setFileNameWithExt('.webp');
+        await sharp(buffer)
+          .webp()
+          .toFile(
+            `${join(this.configService.get<string>('IMAGES_DEST'), filename)}`,
+          );
+        fileNames.push(filename);
+      }),
+    );
+    context.getArgByIndex(0).files = fileNames;
     return next.handle();
   }
 }

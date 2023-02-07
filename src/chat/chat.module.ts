@@ -9,10 +9,11 @@ import { ChatService } from './chat.service';
 import { MessageController } from './message.controller';
 import { Chat } from './models/chat.model';
 import { Message } from './models/message.model';
+import { Image } from './models/image.model';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Chat, Message, User]),
+    TypeOrmModule.forFeature([Chat, Message, User, Image]),
     UserModule,
     SocketModule,
     ConfigModule,

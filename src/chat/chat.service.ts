@@ -6,18 +6,20 @@ import { ChatCreateDTO } from './dto/chatCreate.dto';
 import { MessageDTO } from './dto/message.dto';
 import { SendedMessage } from './dto/sendedMessage.dto';
 import { ChatInterface } from './interfaces/chat.interface';
-import { CreatedChatInterface } from './interfaces/createdChat.interface';
+
 import { SendedMessageInterface } from './interfaces/sendedMessage.interface';
 import { Chat } from './models/chat.model';
 import { Message } from './models/message.model';
-import sharp from 'sharp';
+
 import { ConfigService } from '@nestjs/config';
+import { Image } from './models/image.model';
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(Chat) private chatRepository: Repository<Chat>,
     @InjectRepository(Message) private messageRepository: Repository<Message>,
+    @InjectRepository(Image) private imageRepository: Repository<Image>,
     @InjectRepository(User) private userRepository: Repository<User>,
     private readonly configService: ConfigService,
   ) {}
@@ -110,8 +112,8 @@ export class ChatService {
   public async getChats(user: User): Promise<ChatInterface[]> {
     const chatModels = await user.chats;
     const chats = await Promise.all(
-      chatModels.map((chat) => {
-        return this.getChat(chat.id, user);
+      chatModels.map(async (chat) => {
+        return await this.getChat(chat.id, user);
       }),
     );
     return chats;
@@ -121,17 +123,16 @@ export class ChatService {
     id: string,
     limit?: number,
   ): Promise<SendedMessageInterface[]> {
-    const chat = await this.chatRepository.findOneBy({ id });
-    if (!chat) {
-      return null;
-    }
-
     limit = limit ?? 20;
 
     const messageModels = await this.messageRepository.find({
+      relations: {
+        user: true,
+        images: true,
+      },
       where: {
         chat: {
-          id: chat.id,
+          id,
         },
       },
       order: {
@@ -140,10 +141,14 @@ export class ChatService {
       take: limit,
     });
 
+    if (!messageModels) {
+      return null;
+    }
+
     const messages = await Promise.all(
       messageModels.map(async (message) => {
         const user = await message.user;
-        return SendedMessage.getData(user, message);
+        return SendedMessage.getData(user, message, await message.images);
       }),
     );
 
@@ -158,23 +163,38 @@ export class ChatService {
 
     const user = await message.user;
 
-    return await SendedMessage.getData(user, message);
+    return await SendedMessage.getData(user, message, await message.images);
   }
 
   public async createMessage(
     messageDto: MessageDTO,
     chat: Chat,
     user: User,
-    fileName?: string,
+    fileNames?: string[],
   ): Promise<SendedMessageInterface> {
+    let images = [];
+    if (fileNames) {
+      images = fileNames.map((path) => {
+        return this.imageRepository.create({
+          path,
+        });
+      });
+    }
+
+    await Promise.all(
+      images.map(async (image) => {
+        await this.imageRepository.save(image);
+      }),
+    );
+
     const message = this.messageRepository.create({
       text: messageDto.text,
       referencedMessage: messageDto.referencedMesage,
-      image: fileName,
     });
     message.chat = Promise.resolve(chat);
     message.user = Promise.resolve(user);
+    message.images = Promise.resolve(images);
     await this.messageRepository.save(message);
-    return await SendedMessage.getData(user, message);
+    return await SendedMessage.getData(user, message, images);
   }
 }

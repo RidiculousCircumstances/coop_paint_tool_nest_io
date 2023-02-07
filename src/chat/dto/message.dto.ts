@@ -13,7 +13,7 @@ export class MessageDTO {
 
   @IsString()
   @IsDefined()
-  @MaxLength(1000)
+  @MaxLength(5000)
   text: string;
 
   @IsString()
