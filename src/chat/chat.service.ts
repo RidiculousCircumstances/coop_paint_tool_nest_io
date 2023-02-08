@@ -174,18 +174,20 @@ export class ChatService {
   ): Promise<SendedMessageInterface> {
     let images = [];
     if (fileNames) {
-      images = fileNames.map((path) => {
-        return this.imageRepository.create({
-          path,
+      if (fileNames) {
+        images = fileNames.map((path) => {
+          return this.imageRepository.create({
+            path,
+          });
         });
-      });
-    }
+      }
 
-    await Promise.all(
-      images.map(async (image) => {
-        await this.imageRepository.save(image);
-      }),
-    );
+      await Promise.all(
+        images.map(async (image) => {
+          await this.imageRepository.save(image);
+        }),
+      );
+    }
 
     const message = this.messageRepository.create({
       text: messageDto.text,
@@ -193,8 +195,13 @@ export class ChatService {
     });
     message.chat = Promise.resolve(chat);
     message.user = Promise.resolve(user);
-    message.images = Promise.resolve(images);
+
+    if (images.length > 0) {
+      message.images = Promise.resolve(images);
+    }
+
     await this.messageRepository.save(message);
+
     return await SendedMessage.getData(user, message, images);
   }
 }

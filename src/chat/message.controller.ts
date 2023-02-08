@@ -55,6 +55,7 @@ export class MessageController {
     AnyFilesInterceptor({
       limits: {
         fileSize: 8000000,
+        files: 6,
       },
       fileFilter: (req, file, cb) =>
         validateFiles(req, file, cb, {
@@ -67,17 +68,9 @@ export class MessageController {
     @Body() messageDto: MessageDTO,
     @UserEmail() email: string,
     @UploadedFiles()
-    files?: Express.Multer.File[],
+    files?: string[],
   ) {
     const user = await this.userService.findUser(email);
-    let fileNames = null;
-    if (files && files.length > 0) {
-      fileNames = files.map((file) => {
-        return `${this.config.get('APP_URL')}:${this.config.get(
-          'APP_PORT',
-        )}${file}`;
-      });
-    }
 
     const chat = await this.chatService.findChat(messageDto.chatId);
 
@@ -88,7 +81,7 @@ export class MessageController {
       messageDto,
       chat,
       user,
-      fileNames,
+      files,
     );
     // this.socketGateway.chatMessage(chat.id, message.messageId);
     return message;

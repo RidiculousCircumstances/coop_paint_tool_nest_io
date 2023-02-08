@@ -9,10 +9,11 @@ export class SendedMessage {
     message: Message,
     images?: Image[] | null,
   ): Promise<SendedMessageInterface> {
+    const domain = `${process.env.APP_URL}:${process.env.APP_PORT}`;
     let paths = [];
     if (images) {
       paths = images.map((image) => {
-        return image.path;
+        return `${domain}${image.path}`;
       });
     }
 
