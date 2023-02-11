@@ -2,17 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
-  FileTypeValidator,
   Get,
   HttpCode,
-  MaxFileSizeValidator,
   NotFoundException,
   Param,
-  ParseFilePipe,
-  ParseIntPipe,
   Post,
   Query,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -20,12 +15,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import { MulterError } from 'multer';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { UserEmail } from 'src/decorators/UserEmail.decorator';
 import { validateFiles } from 'src/files/FilesValidator';
 import { WebpInterceptor } from 'src/interceptors/webp.Iterceptor';
-import { FilesValidator } from 'src/pipes/FilesValidatorPipe';
 import { SocketGateway } from '../socket/socket.gateway';
 import { JwtAuthGuard } from '../user/guards/jwtAuth.guard';
 import { UserService } from '../user/user.service';
@@ -71,7 +64,6 @@ export class MessageController {
     files?: string[],
   ) {
     const user = await this.userService.findUser(email);
-
     const chat = await this.chatService.findChat(messageDto.chatId);
 
     if (!user || !chat) {

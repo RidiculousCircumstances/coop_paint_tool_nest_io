@@ -1,6 +1,7 @@
 import {
   IsDefined,
   IsNumber,
+  IsNumberString,
   IsOptional,
   IsString,
   MaxLength,
@@ -20,7 +21,7 @@ export class MessageDTO {
   @IsOptional()
   image?: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  referencedMesage?: number;
+  referencedMessage?: string;
 }

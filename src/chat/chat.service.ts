@@ -173,14 +173,13 @@ export class ChatService {
     fileNames?: string[],
   ): Promise<SendedMessageInterface> {
     let images = [];
-    if (fileNames) {
-      if (fileNames) {
-        images = fileNames.map((path) => {
-          return this.imageRepository.create({
-            path,
-          });
+
+    if (fileNames.length > 0) {
+      images = fileNames.map((path) => {
+        return this.imageRepository.create({
+          path,
         });
-      }
+      });
 
       await Promise.all(
         images.map(async (image) => {
@@ -189,9 +188,13 @@ export class ChatService {
       );
     }
 
+    let refId = Number(messageDto.referencedMessage);
+    if (isNaN(refId)) {
+      refId = null;
+    }
     const message = this.messageRepository.create({
       text: messageDto.text,
-      referencedMessage: messageDto.referencedMesage,
+      referencedMessage: refId,
     });
     message.chat = Promise.resolve(chat);
     message.user = Promise.resolve(user);
