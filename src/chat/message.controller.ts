@@ -2,25 +2,22 @@ import {
   BadRequestException,
   Body,
   Controller,
-  FileTypeValidator,
   Get,
   HttpCode,
-  MaxFileSizeValidator,
   NotFoundException,
   Param,
-  ParseFilePipe,
-  ParseIntPipe,
   Post,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { UserEmail } from 'src/decorators/UserEmail.decorator';
+import { validateFiles } from 'src/files/FilesValidator';
 import { WebpInterceptor } from 'src/interceptors/webp.Iterceptor';
 import { SocketGateway } from '../socket/socket.gateway';
 import { JwtAuthGuard } from '../user/guards/jwtAuth.guard';
@@ -47,29 +44,26 @@ export class MessageController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image', {}), WebpInterceptor)
+  @UseInterceptors(
+    AnyFilesInterceptor({
+      limits: {
+        fileSize: 8000000,
+        files: 6,
+      },
+      fileFilter: (req, file, cb) =>
+        validateFiles(req, file, cb, {
+          mimetype: 'jpg|webp|png|jpeg',
+        }),
+    }),
+    WebpInterceptor,
+  )
   public async create(
     @Body() messageDto: MessageDTO,
     @UserEmail() email: string,
-    @UploadedFile(
-      new ParseFilePipe({
-        fileIsRequired: false,
-        validators: [
-          new FileTypeValidator({ fileType: 'image/jpeg|image/png' }),
-          new MaxFileSizeValidator({ maxSize: 8000000 }),
-        ],
-      }),
-    )
-    file?: Express.Multer.File,
+    @UploadedFiles()
+    files?: string[],
   ) {
     const user = await this.userService.findUser(email);
-
-    const fileName = file
-      ? `${this.config.get('APP_URL')}:${this.config.get('APP_PORT')}${
-          file.filename
-        }`
-      : null;
-
     const chat = await this.chatService.findChat(messageDto.chatId);
 
     if (!user || !chat) {
@@ -79,7 +73,7 @@ export class MessageController {
       messageDto,
       chat,
       user,
-      fileName,
+      files,
     );
     // this.socketGateway.chatMessage(chat.id, message.messageId);
     return message;

@@ -1,6 +1,7 @@
 import {
   IsDefined,
   IsNumber,
+  IsNumberString,
   IsOptional,
   IsString,
   MaxLength,
@@ -13,14 +14,14 @@ export class MessageDTO {
 
   @IsString()
   @IsDefined()
-  @MaxLength(1000)
+  @MaxLength(5000)
   text: string;
 
   @IsString()
   @IsOptional()
   image?: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
-  referencedMesage?: number;
+  referencedMessage?: string;
 }

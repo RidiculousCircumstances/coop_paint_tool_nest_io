@@ -4,6 +4,7 @@ import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Chat } from '../chat/models/chat.model';
 import { Message } from '../chat/models/message.model';
 import { User } from '../user/models/user.model';
+import { Image } from '../chat/models/image.model';
 
 @Injectable()
 export class MySQLConfigService implements TypeOrmOptionsFactory {
@@ -19,7 +20,7 @@ export class MySQLConfigService implements TypeOrmOptionsFactory {
       database: this.configService.get<string>('DB_DATABASE'),
       synchronize: true,
       autoLoadEntities: true,
-      entities: [User, Chat, Message],
+      entities: [User, Chat, Message, Image],
       charset: 'utf8mb4',
     };
   }

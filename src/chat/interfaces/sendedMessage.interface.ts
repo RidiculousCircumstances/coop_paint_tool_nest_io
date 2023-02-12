@@ -1,9 +1,11 @@
+import { Image } from '../models/image.model';
+
 export interface SendedMessageInterface {
   messageId: number;
   userId: number;
   chatId: string;
   text: string;
-  image: string | null;
+  images: string[];
   referencedMessage: number | null;
   nickname: string;
   created: Date;
