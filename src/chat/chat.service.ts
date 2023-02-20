@@ -123,7 +123,7 @@ export class ChatService {
     id: string,
     limit?: number,
   ): Promise<SendedMessageInterface[]> {
-    limit = limit ?? 20;
+    limit = limit ?? 30;
 
     const messageModels = await this.messageRepository.find({
       relations: {

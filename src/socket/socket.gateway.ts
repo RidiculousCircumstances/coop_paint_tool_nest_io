@@ -19,20 +19,47 @@ export class SocketGateway
 
   roomId: string;
 
-  handleConnection() {
-    console.log('client connected');
+  handleConnection(client: Socket) {
+    // const userId = client.handshake.query;
+    // console.log(userId.userId);
+    // console.log('client connected');
   }
 
   public handleDisconnect() {
-    console.log('client disconnected');
+    // console.log('client disconnected');
   }
 
   @SubscribeMessage('joinRoom')
-  public joinRoom(
+  public async joinRoom(
     @MessageBody() data: JoinRoom,
     @ConnectedSocket() client: Socket,
   ) {
+    console.log(`${data.clientId} joined`);
+
+    /**
+     * Отправляем клиенту список пользователей онлайн
+     */
+    const users = await this.server.of('/').in(data.roomId).fetchSockets();
+    const userIds = users.map((user) => {
+      const userId = user.handshake.query.userId as string;
+      if (Number(userId) !== data.clientId) {
+        return userId;
+      }
+    });
+    console.log(userIds);
+
     client.join(data.roomId);
+
+    /**
+     * Событие на получение списка пользователей онлайн
+     */
+    client.emit('recieveOnlineUsers', {
+      userIds,
+    });
+
+    /**
+     * Ретрансляция события входа в комнату-
+     */
     client.to(data.roomId).emit('joinRoom', data);
   }
 
