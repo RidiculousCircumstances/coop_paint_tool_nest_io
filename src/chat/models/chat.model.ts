@@ -3,11 +3,9 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  Unique,
   ManyToMany,
   OneToMany,
   CreateDateColumn,
-  OneToOne,
   ManyToOne,
 } from 'typeorm';
 import { Message } from './message.model';
@@ -16,12 +14,6 @@ import { Message } from './message.model';
 export class Chat {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  // @Column({
-  //   type: 'varchar',
-  //   length: 100,
-  // })
-  // chat_link: string;
 
   @Column()
   name: string;

@@ -22,6 +22,7 @@ export class MySQLConfigService implements TypeOrmOptionsFactory {
       autoLoadEntities: true,
       entities: [User, Chat, Message, Image],
       charset: 'utf8mb4',
+      cache: true,
     };
   }
 }

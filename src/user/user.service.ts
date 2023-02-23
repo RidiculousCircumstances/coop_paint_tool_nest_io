@@ -7,6 +7,8 @@ import { genSalt, hash, compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { UserPayloadInterface } from './interfaces/userPayload.interface';
 import { UserResponseInterface } from './interfaces/userResponse.interface';
+import { UserData } from './dto/userData.dto';
+import { UserDataInterface } from './interfaces/userData.interface';
 
 @Injectable()
 export class UserService {
@@ -34,7 +36,7 @@ export class UserService {
       nickname: dto.nickname,
       password: await hash(dto.password, salt),
     });
-    this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
     return this.authorizeUser(newUser);
   }
 
@@ -67,5 +69,13 @@ export class UserService {
       token: await this.jwtService.signAsync(payload),
       createdAt: user.createdAt,
     };
+  }
+
+  public async getUser(id: number): Promise<UserDataInterface> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      return null;
+    }
+    return UserData.getData(user);
   }
 }

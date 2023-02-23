@@ -2,9 +2,13 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
+  NotFoundException,
+  Param,
   Post,
   UnauthorizedException,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,6 +18,8 @@ import {
 } from 'src/constants/constants';
 import { UserAuthorizationDTO } from './dto/userAutorization.dto';
 import { UserRegistrationDTO } from './dto/userRegistration.dto';
+import { JwtAuthGuard } from './guards/jwtAuth.guard';
+import { UserDataInterface } from './interfaces/userData.interface';
 import { UserResponseInterface } from './interfaces/userResponse.interface';
 import { User } from './models/user.model';
 import { UserService } from './user.service';
@@ -45,9 +51,21 @@ export class UserController {
     @Body() { email, password }: UserAuthorizationDTO,
   ): Promise<UserResponseInterface> {
     const user = await this.userService.validateUser(email, password);
-    if (user) {
-      return this.userService.authorizeUser(user);
+    if (!user) {
+      throw new UnauthorizedException(WRONG_USER_PASSWORD_ERROR);
     }
-    throw new UnauthorizedException(WRONG_USER_PASSWORD_ERROR);
+    return this.userService.authorizeUser(user);
+  }
+
+  @Get(':id')
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
+  @UseGuards(JwtAuthGuard)
+  public async getUser(@Param('id') id: number): Promise<UserDataInterface> {
+    const user = await this.userService.getUser(id);
+    if (!user) {
+      throw new NotFoundException('There is no such user');
+    }
+    return user;
   }
 }

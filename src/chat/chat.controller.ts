@@ -7,7 +7,6 @@ import {
   NotFoundException,
   Param,
   Post,
-  Query,
   UnauthorizedException,
   UseGuards,
   UsePipes,
@@ -20,6 +19,7 @@ import { UserService } from '../user/user.service';
 import { ChatService } from './chat.service';
 import { ChatCreateDTO } from './dto/chatCreate.dto';
 import { ChatInterface } from './interfaces/chat.interface';
+import { ChatMemberInterface } from './interfaces/chatMember.interface';
 import { Chat } from './models/chat.model';
 
 @Controller('chat')
@@ -87,9 +87,25 @@ export class ChatController {
     const chats = await this.chatService.getChats(user);
 
     if (!chats.length) {
-      throw new NotFoundException();
+      throw new NotFoundException('Chat list is empty');
     }
 
     return chats;
+  }
+
+  /**
+   * Получить список пользователей чата
+   */
+  @Get('/members/:id')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  public async getChatMembers(
+    @Param('id') id: string,
+  ): Promise<ChatMemberInterface[]> {
+    const chatMembers = await this.chatService.getChatMembers(id);
+    if (!chatMembers) {
+      throw new NotFoundException('Chat has no users');
+    }
+    return chatMembers;
   }
 }

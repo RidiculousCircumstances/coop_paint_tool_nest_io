@@ -13,6 +13,7 @@ import { Message } from './models/message.model';
 
 import { ConfigService } from '@nestjs/config';
 import { Image } from './models/image.model';
+import { ChatMemberInterface } from './interfaces/chatMember.interface';
 
 @Injectable()
 export class ChatService {
@@ -166,6 +167,14 @@ export class ChatService {
     return await SendedMessage.getData(user, message, await message.images);
   }
 
+  /**
+   * Сохранить сообщение
+   * @param messageDto
+   * @param chat
+   * @param user
+   * @param fileNames
+   * @returns
+   */
   public async createMessage(
     messageDto: MessageDTO,
     chat: Chat,
@@ -206,5 +215,32 @@ export class ChatService {
     await this.messageRepository.save(message);
 
     return await SendedMessage.getData(user, message, images);
+  }
+
+  /**
+   * Получить сипсок участников указанной комнаты - не используется
+   * @param id
+   * @returns
+   */
+  public async getChatMembers(id: string): Promise<ChatMemberInterface[]> {
+    const chat = await this.chatRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        users: true,
+      },
+    });
+
+    const members =
+      chat &&
+      (await chat.users).map((user) => {
+        return {
+          id: user.id,
+          nickname: user.nickname,
+        };
+      });
+
+    return members;
   }
 }
